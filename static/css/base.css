@@ -10,10 +10,14 @@
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 html,
 body {
-  height: 100%;
-  overflow: hidden;
+  /* Never trap page scroll */
+  min-height: 100%;
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-ui);
@@ -23,7 +27,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Background effects */
+/* Subtle radial glow — fixed overlay, does not affect scroll */
 body::before {
   content: '';
   position: fixed;
@@ -32,54 +36,43 @@ body::before {
   transform: translateX(-50%);
   width: 800px;
   height: 800px;
-  background: radial-gradient(circle, rgba(214, 255, 58, 0.06) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(214, 255, 58, 0.04) 0%, transparent 70%);
   pointer-events: none;
   z-index: 0;
 }
 
-body::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image: 
-    linear-gradient(var(--border) 1px, transparent 1px),
-    linear-gradient(90deg, var(--border) 1px, transparent 1px);
-  background-size: 40px 40px;
-  opacity: 0.03;
-  pointer-events: none;
-  z-index: 0;
-}
-
-/* Layout Container */
+/* Tool wrapper — fills the viewport height but does NOT lock body scroll */
 .app {
   position: relative;
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  width: 100vw;
+  min-height: 100vh;
   z-index: 1;
 }
 
-/* Main content area */
+/* Main two-column area — expands to content, does NOT overflow:hidden */
 .main {
-  flex: 1;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--space-lg);
   padding: var(--space-lg);
-  overflow: hidden;
+  /* Allow natural document height */
+  min-height: 600px;
 }
 
-/* Panels */
+/* Panels — fixed height so each pane scrolls independently */
 .panel {
   display: flex;
   flex-direction: column;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-panel);
-  overflow: hidden;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
   transition: border-color var(--transition);
+  /* Use viewport-relative height so panels are tall but page still scrolls */
+  height: calc(100vh - 120px);
+  min-height: 500px;
+  overflow: hidden; /* Internal panels control their own scroll; page scroll is on body */
 }
 
 .panel:hover {
@@ -88,8 +81,8 @@ body::after {
 
 /* Scrollbar styling */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -106,25 +99,29 @@ body::after {
 }
 
 /* Responsive: mobile stacks vertically */
-@media (max-width: 768px) {
+@media (max-width: 800px) {
   .main {
     grid-template-columns: 1fr;
-    gap: var(--space-md);
-    padding: var(--space-md);
+    gap: 0;
+    padding: 0;
+    min-height: unset;
+  }
+
+  .panel {
+    height: calc(100vh - 160px);
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
   }
 }
 
 /* Utility classes */
-.mono {
-  font-family: var(--font-code);
-}
-
-.serif {
-  font-family: var(--font-display);
-}
+.mono { font-family: var(--font-code); }
+.serif { font-family: var(--font-display); }
 
 /* Motion respect */
 @media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
   *,
   *::before,
   *::after {

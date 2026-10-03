@@ -107,6 +107,12 @@ def create_app():
             "message": "An internal error occurred. Please try again later."
         }), 500
     
+    # Health check (root-level for Render)
+    @app.route('/health')
+    def health():
+        """Root health check for Render and load balancers"""
+        return jsonify({"status": "healthy"}), 200
+
     # Main route
     @app.route('/')
     def index():

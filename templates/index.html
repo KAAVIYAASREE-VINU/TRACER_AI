@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TRACER AI v2</title>
+  <title>TRACER AI — Code on trial</title>
   
   <!-- Favicon -->
   <link rel="icon" href="data:,">
@@ -19,91 +19,133 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
 </head>
 <body>
-  <div class="app">
-    <!-- Top Bar -->
-    <header class="top-bar">
-      <div class="wordmark">
-        <svg class="wordmark-glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <path d="M3 3l18 18M3 21L21 3"/>
-        </svg>
-        <span>TRACER</span>
+  <!-- Sticky Nav -->
+  <nav class="sticky-nav" aria-label="Page navigation">
+    <a class="nav-link" href="#tracerTool">Tool</a>
+    <span class="nav-sep">·</span>
+    <a class="nav-link" href="#howSection">How it works</a>
+    <a class="nav-link nav-top" href="#">Top</a>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-label">CASE FILE / HYBRID VERIFICATION</div>
+      <h1 class="hero-headline">Code on trial.</h1>
+      <p class="hero-subtitle">AI finds the bugs. A parser checks the fix. Nothing unverified is presented as certain.</p>
+      <button class="btn btn-primary hero-cta" id="heroStartBtn">Start a trace</button>
+    </div>
+    <svg class="trace-line" viewBox="0 0 1000 200" preserveAspectRatio="none">
+      <path class="trace-path" d="M 0 100 L 200 100 L 300 50 L 500 150 L 700 100 L 1000 100" />
+      <path class="trace-scan" d="M 0 100 L 200 100 L 300 50 L 500 150 L 700 100 L 1000 100" />
+    </svg>
+  </section>
+  
+  <div class="app" id="tracerTool">
+    <!-- Case File Header -->
+    <header class="case-header">
+      <div class="case-info">
+        <span class="case-label">CASE No.</span>
+        <span class="case-number" id="caseNumber">001</span>
+        <span class="case-separator">·</span>
+        <span class="case-date" id="caseDate"></span>
+        <span class="case-separator">·</span>
+        <span class="case-status" id="caseStatus">STATUS: OPEN</span>
       </div>
       
-      <div class="case-chip">
-        CASE #<span id="caseNumber">001</span>
-      </div>
-      
-      <div class="mode-switch" role="radiogroup" aria-label="Analysis mode">
-        <button class="mode-btn active" role="radio" aria-checked="true" data-mode="debug">
-          Debug
-        </button>
-        <button class="mode-btn" role="radio" aria-checked="false" data-mode="review">
-          Review
-        </button>
-        <button class="mode-btn disabled" role="radio" aria-checked="false" data-mode="explain" title="Coming soon">
-          Explain <span class="btn-label">soon</span>
+      <div class="case-controls">
+        <div class="mode-switch" role="radiogroup" aria-label="Analysis mode">
+          <button class="mode-btn active" role="radio" aria-checked="true" data-mode="debug">
+            Debug
+          </button>
+          <button class="mode-btn" role="radio" aria-checked="false" data-mode="review">
+            Review
+          </button>
+          <button class="mode-btn disabled" role="radio" aria-checked="false" data-mode="explain" title="Coming soon">
+            Explain <span class="btn-label">soon</span>
+          </button>
+        </div>
+        
+        <button class="btn" id="historyBtn" aria-label="View analysis history">
+          History
         </button>
       </div>
     </header>
 
     <!-- Main Content -->
-    <main class="main">
+    <main class="main" id="mainContent">
       <!-- Left Panel: Editor -->
-      <section class="panel">
-        <header class="editor-header">
-          <h2 class="panel-title">Source Code</h2>
+      <section class="panel panel-source">
+        <header class="panel-header">
+          <h2 class="exhibit-label">EXHIBIT A</h2>
           <div class="editor-actions">
             <button class="btn" id="uploadBtn" aria-label="Upload file">
               Upload
             </button>
-            <button class="btn btn-primary" id="traceBtn" aria-label="Run analysis">
+            <button class="btn btn-primary" id="traceBtn" aria-label="Run analysis (Cmd+Enter)">
               Trace Code
               <span class="kbd-hint">⌘↵</span>
             </button>
           </div>
         </header>
         
-        <div class="editor-container" id="editorContainer"></div>
+        <div class="editor-container" id="editorContainer" aria-label="Code editor"></div>
         
         <footer class="status-bar">
           <div class="status-item">
             <span id="statusLanguage">Python</span>
-            <span class="status-separator">•</span>
+            <span class="status-separator">·</span>
             <span id="statusLines">0 lines</span>
-            <span class="status-separator">•</span>
+            <span class="status-separator">·</span>
             <span id="statusChars">0 chars</span>
           </div>
           <div class="status-item">
-            <span class="verification-badge muted">Ready</span>
+            <span class="verification-stamp ai-suggestion" data-popover="No machine verification performed. This is an AI proposal.">AI SUGGESTION</span>
           </div>
         </footer>
         
         <div class="examples">
-          <div class="examples-title">Try an example</div>
+          <div class="examples-title">SAMPLE EXHIBITS</div>
           <div class="examples-grid">
-            <button class="example-chip" data-example="python">
-              <span class="lang-dot" style="color: #FFB020;"></span>
-              Python bug
+            <button class="example-chip" data-example="python" aria-label="Load Python example">
+              <span class="lang-dot" style="color: #FFB020;">●</span>
+              Python
             </button>
-            <button class="example-chip" data-example="javascript">
-              <span class="lang-dot" style="color: #7DD3C8;"></span>
-              JavaScript bug
+            <button class="example-chip" data-example="javascript" aria-label="Load JavaScript example">
+              <span class="lang-dot" style="color: #7DD3C8;">●</span>
+              JavaScript
             </button>
-            <button class="example-chip" data-example="c">
-              <span class="lang-dot" style="color: #FF5A4E;"></span>
-              C bug
+            <button class="example-chip" data-example="c" aria-label="Load C example">
+              <span class="lang-dot" style="color: #FF5A4E;">●</span>
+              C
+            </button>
+            <button class="example-chip" data-example="java" aria-label="Load Java example">
+              <span class="lang-dot" style="color: #FFB020;">●</span>
+              Java
+            </button>
+            <button class="example-chip" data-example="cpp" aria-label="Load C++ example">
+              <span class="lang-dot" style="color: #7DD3C8;">●</span>
+              C++
+            </button>
+            <button class="example-chip" data-example="sql" aria-label="Load SQL example">
+              <span class="lang-dot" style="color: #FF5A4E;">●</span>
+              SQL
             </button>
           </div>
         </div>
       </section>
 
       <!-- Right Panel: Report -->
-      <section class="panel">
-        <header class="report-header">
-          <div class="verdict" id="verdict">—</div>
+      <section class="panel panel-report">
+        <header class="panel-header">
+          <h2 class="exhibit-label">FINDINGS</h2>
         </header>
         
-        <div class="report-content" id="reportContent">
+        <div class="verdict-area">
+          <div class="verdict" id="verdict">—</div>
+        </div>
+        
+        <div class="report-content" id="reportContent" aria-live="polite" aria-atomic="false">
           <div class="empty-state">
             <div class="empty-state-title">No analysis yet</div>
             <p class="empty-state-text">
@@ -113,7 +155,51 @@
         </div>
       </section>
     </main>
+    
+    <!-- Mobile tab toggle -->
+    <div class="mobile-tabs">
+      <button class="mobile-tab active" data-tab="source">Source</button>
+      <button class="mobile-tab" data-tab="report">Report</button>
+    </div>
+    
+    <!-- Mobile sticky trace button -->
+    <button class="mobile-trace-btn btn btn-primary" aria-label="Run analysis">
+      Trace Code
+    </button>
   </div>
+  
+  <!-- How It Works Section -->
+  <section class="how-section" id="howSection">
+    <h2 class="section-headline">How it works</h2>
+    <div class="steps-grid">
+      <div class="step">
+        <div class="step-number">01</div>
+        <div class="step-title">AI proposes</div>
+        <p class="step-text">The language model analyzes your code and suggests fixes based on patterns it has learned.</p>
+      </div>
+      <div class="step">
+        <div class="step-number">02</div>
+        <div class="step-title">Parser verifies</div>
+        <p class="step-text">When possible, a real parser checks if the fixed code is syntactically valid.</p>
+      </div>
+      <div class="step">
+        <div class="step-number">03</div>
+        <div class="step-title">You see the truth</div>
+        <p class="step-text">Verified output is stamped. Unverified suggestions are clearly labeled as AI proposals.</p>
+      </div>
+    </div>
+    <div class="limitations">
+      <strong>Limitations:</strong> Only Python fixes are machine-checked. JavaScript, Java, C, C++, and SQL fixes are AI proposals only. AI can be wrong—always review suggestions carefully.
+    </div>
+  </section>
+  
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-content">
+      <div class="footer-label">TRACER AI v2.0</div>
+      <a href="https://github.com" class="footer-link" target="_blank" rel="noopener">GitHub →</a>
+    </div>
+  </footer>
 
   <!-- Hidden file input -->
   <input type="file" id="fileInput" accept=".py,.js,.java,.cpp,.c,.sql,.ts,.jsx,.tsx" hidden>

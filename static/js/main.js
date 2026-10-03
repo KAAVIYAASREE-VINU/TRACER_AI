@@ -225,7 +225,10 @@ function updateStatusBar() {
   
   // Auto-detect language (matches backend logic)
   let lang = 'Python';
-  if (text.includes('#include') && (text.includes('printf') || text.includes('scanf'))) {
+  // C: #include but purely C signals (printf/scanf/main, no C++ markers)
+  if (text.includes('#include') && (text.includes('printf') || text.includes('scanf')) &&
+      !text.includes('std::') && !text.includes('cout') && !text.includes('cin') &&
+      !text.includes('class ') && !text.includes('::')) {
     lang = 'C';
   } else if (text.includes('#include') || text.includes('std::') || text.includes('cout') || text.includes('cin')) {
     lang = 'C++';
@@ -422,7 +425,35 @@ int main() {
     return 0;
 }
 
-// Bug: array out of bounds`
+// Bug: array out of bounds`,
+
+  java: `public class BankAccount {
+    private double balance;
+    
+    public void withdraw(double amount) {
+        balance = balance - amount;
+    }
+}
+
+// Bug: no check for negative balance or overdraft`,
+
+  cpp: `#include <iostream>
+#include <string>
+
+int main() {
+    std::string* ptr = new std::string("data");
+    std::cout << *ptr << std::endl;
+    return 0;
+}
+
+// Bug: memory leak, missing delete`,
+
+  sql: `SELECT users.name, orders.total
+FROM users
+LEFT JOIN orders ON users.id = orders.user_id
+WHERE orders.total > 100;
+
+-- Bug: LEFT JOIN + WHERE nullifies the outer join`
 };
 
 // Example chips
@@ -531,7 +562,7 @@ async function runAnalysis() {
 
 // Show staged loading indicator
 function showLoadingState() {
-  const stages = ['Reading', 'Static check', 'Tracing', 'Verifying', 'Done'];
+  const stages = ['Reading exhibit...', 'Static check...', 'Tracing...', 'Verifying...', 'Complete'];
   let currentStage = 0;
   
   const container = document.getElementById('reportContent');
@@ -541,57 +572,41 @@ function showLoadingState() {
   const loadingDiv = document.createElement('div');
   loadingDiv.className = 'loading-state';
   
-  // Progress stages
-  const stagesDiv = document.createElement('div');
-  stagesDiv.className = 'progress-stages';
+  // Progress stage text
+  const stageText = document.createElement('div');
+  stageText.className = 'progress-stages';
+  stageText.textContent = stages[0];
+  loadingDiv.appendChild(stageText);
   
-  stages.forEach((stageName, idx) => {
-    const stageDiv = document.createElement('div');
-    stageDiv.className = 'stage';
-    stageDiv.dataset.stage = idx;
-    stageDiv.textContent = stageName;
-    stagesDiv.appendChild(stageDiv);
-  });
+  // Redaction bars
+  const barsDiv = document.createElement('div');
+  barsDiv.className = 'redaction-bars';
   
-  loadingDiv.appendChild(stagesDiv);
-  
-  // Progress bar
-  const progressBar = document.createElement('div');
-  progressBar.className = 'progress-bar';
-  const progressFill = document.createElement('div');
-  progressFill.className = 'progress-fill';
-  progressFill.style.width = '0%';
-  progressBar.appendChild(progressFill);
-  loadingDiv.appendChild(progressBar);
-  
-  // Skeleton findings
   for (let i = 0; i < 3; i++) {
-    const skeleton = document.createElement('div');
-    skeleton.className = 'skeleton skeleton-finding';
-    loadingDiv.appendChild(skeleton);
+    const bar = document.createElement('div');
+    bar.className = 'redaction-bar';
+    const scan = document.createElement('div');
+    scan.className = 'redaction-scan';
+    bar.appendChild(scan);
+    barsDiv.appendChild(bar);
   }
   
+  loadingDiv.appendChild(barsDiv);
   container.appendChild(loadingDiv);
   
   // Update verdict
   const verdictEl = document.getElementById('verdict');
   if (verdictEl) verdictEl.textContent = 'Analyzing...';
   
-  // Animate stages
+  // Rotate stage text
   const interval = setInterval(() => {
-    if (currentStage >= stages.length) {
-      clearInterval(interval);
-      return;
-    }
-    
-    const stageEl = stagesDiv.querySelector(`[data-stage="${currentStage}"]`);
-    if (stageEl) stageEl.classList.add('active');
-    
-    const progress = ((currentStage + 1) / stages.length) * 100;
-    progressFill.style.width = `${progress}%`;
-    
     currentStage++;
-  }, 400);
+    if (currentStage < stages.length) {
+      stageText.textContent = stages[currentStage];
+    } else {
+      clearInterval(interval);
+    }
+  }, 600);
   
   window.tracerLoadingInterval = interval;
 }
@@ -760,38 +775,60 @@ function renderFindings(container, findings) {
 
 // Render debug mode with tabs (Findings + Fix)
 function renderDebugMode(container, data) {
-  // Create tabs
+  const findings = data.findings || [];
+  const hasFindings = findings.length > 0;
+
+  // Create tabs — always start on Findings
   const tabsDiv = document.createElement('div');
   tabsDiv.className = 'report-tabs';
-  
+
   const findingsTabBtn = document.createElement('button');
   findingsTabBtn.className = 'tab-btn active';
   findingsTabBtn.textContent = 'Findings';
   findingsTabBtn.dataset.tab = 'findings';
-  
+
   const fixTabBtn = document.createElement('button');
   fixTabBtn.className = 'tab-btn';
   fixTabBtn.textContent = 'Fix';
   fixTabBtn.dataset.tab = 'fix';
-  
+
   tabsDiv.appendChild(findingsTabBtn);
   tabsDiv.appendChild(fixTabBtn);
   container.appendChild(tabsDiv);
-  
-  // Findings panel
+
+  // Findings panel — always active on load
   const findingsPanel = document.createElement('div');
   findingsPanel.className = 'tab-panel active';
   findingsPanel.id = 'tab-findings';
-  renderFindings(findingsPanel, data.findings || []);
+
+  if (!hasFindings) {
+    // 0-defects empty state with explanation
+    const noDefects = document.createElement('div');
+    noDefects.className = 'empty-state';
+
+    const title = document.createElement('div');
+    title.className = 'empty-state-title';
+    title.textContent = 'No defects found';
+
+    const text = document.createElement('p');
+    text.className = 'empty-state-text';
+    text.textContent = 'The AI found nothing actionable in this snippet. That could mean the code is correct, or the issue is outside what the model can detect. Review the Fix tab to see the full output.';
+
+    noDefects.appendChild(title);
+    noDefects.appendChild(text);
+    findingsPanel.appendChild(noDefects);
+  } else {
+    renderFindings(findingsPanel, findings);
+  }
   container.appendChild(findingsPanel);
-  
-  // Fix panel
+
+  // Fix panel — starts hidden
   const fixPanel = document.createElement('div');
   fixPanel.className = 'tab-panel';
   fixPanel.id = 'tab-fix';
   renderFixTab(fixPanel, data);
   container.appendChild(fixPanel);
-  
+
   // Tab switching
   findingsTabBtn.addEventListener('click', () => {
     findingsTabBtn.classList.add('active');
@@ -799,7 +836,7 @@ function renderDebugMode(container, data) {
     findingsPanel.classList.add('active');
     fixPanel.classList.remove('active');
   });
-  
+
   fixTabBtn.addEventListener('click', () => {
     fixTabBtn.classList.add('active');
     findingsTabBtn.classList.remove('active');
@@ -1044,11 +1081,24 @@ function renderFixTab(container, data) {
   downloadBtn.className = 'btn';
   downloadBtn.textContent = 'Download';
   downloadBtn.addEventListener('click', () => {
+    // Get language extension from meta
+    const lang = data.meta?.language || 'txt';
+    const extMap = {
+      'python': 'py',
+      'javascript': 'js',
+      'java': 'java',
+      'cpp': 'cpp',
+      'c': 'c',
+      'sql': 'sql',
+      'unknown': 'txt'
+    };
+    const ext = extMap[lang] || 'txt';
+    
     const blob = new Blob([data.fixed_code], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'fixed_code.txt';
+    a.download = `fixed_code.${ext}`;
     a.click();
     URL.revokeObjectURL(url);
   });
@@ -1071,6 +1121,7 @@ function renderFixTab(container, data) {
       doc: originalCode,
       extensions: [
         EditorView.editable.of(false),
+        EditorView.lineWrapping,
         syntaxHighlighting(defaultHighlightStyle),
         EditorView.theme({
           '&': { fontSize: '14px', fontFamily: "'JetBrains Mono', monospace" },
@@ -1082,6 +1133,7 @@ function renderFixTab(container, data) {
       doc: data.fixed_code,
       extensions: [
         EditorView.editable.of(false),
+        EditorView.lineWrapping,
         syntaxHighlighting(defaultHighlightStyle),
         EditorView.theme({
           '&': { fontSize: '14px', fontFamily: "'JetBrains Mono', monospace" },
@@ -1095,30 +1147,30 @@ function renderFixTab(container, data) {
 
 // Update verification badge
 function updateVerificationBadge(verification) {
-  const badge = document.querySelector('.verification-badge');
+  const badge = document.querySelector('.verification-stamp');
   if (!badge || !verification) return;
   
-  badge.className = 'verification-badge';
+  badge.className = 'verification-stamp';
   
-  // 3 states: ok (passed), warn (repaired), muted (not verified)
+  // 3 states: verified (passed), repaired, ai-suggestion (not verified)
   if (verification.passed === true) {
-    badge.classList.add('ok');
-    badge.textContent = '✓ ' + (verification.detail || 'Parses cleanly');
+    badge.classList.add('verified');
+    badge.textContent = 'VERIFIED';
     badge.dataset.popover = 'Code parsed successfully without errors.';
   } else if (verification.checked && verification.passed === false) {
-    badge.classList.add('warn');
-    badge.textContent = '⚠ ' + (verification.detail || 'Repaired once');
+    badge.classList.add('repaired');
+    badge.textContent = 'REPAIRED';
     badge.dataset.popover = 'Fix required syntax repairs to be valid.';
   } else {
-    badge.classList.add('muted');
-    badge.textContent = verification.detail || 'Not verified';
-    badge.dataset.popover = 'No verification performed.';
+    badge.classList.add('ai-suggestion');
+    badge.textContent = 'AI SUGGESTION';
+    badge.dataset.popover = 'No machine verification performed. This is an AI proposal — review carefully.';
   }
 }
 
 // Show verification popover on hover
 document.addEventListener('DOMContentLoaded', () => {
-  const badge = document.querySelector('.verification-badge');
+  const badge = document.querySelector('.verification-stamp');
   if (!badge) return;
   
   let popover = null;
@@ -1175,12 +1227,16 @@ function showEmptyState() {
   const verdictEl = document.getElementById('verdict');
   if (verdictEl) verdictEl.textContent = '—';
   
-  // Reset verification badge
-  const badge = document.querySelector('.verification-badge');
+  // Reset verification stamp
+  const badge = document.querySelector('.verification-stamp');
   if (badge) {
-    badge.className = 'verification-badge muted';
-    badge.textContent = 'Ready';
+    badge.className = 'verification-stamp ai-suggestion';
+    badge.textContent = 'AI SUGGESTION';
+    badge.dataset.popover = 'No machine verification performed. This is an AI proposal — review carefully.';
   }
+  
+  // Reopen case
+  updateCaseStatus(false);
 }
 
 // Show error state
@@ -1273,10 +1329,298 @@ if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
     initEditor();
     showEmptyState();
+    initHistory();
+    initKeyboardNav();
+    initHero();
+    initCaseHeader();
   });
 } else {
   initEditor();
   showEmptyState();
+  initHistory();
+  initKeyboardNav();
+  initHero();
+  initCaseHeader();
 }
 
 console.log('✓ TRACER AI v2 initialized');
+
+// ========================================
+// HERO & CASE HEADER
+// ========================================
+
+function initHero() {
+  const heroBtn = document.getElementById('heroStartBtn');
+  if (heroBtn) {
+    heroBtn.addEventListener('click', () => {
+      const tool = document.getElementById('tracerTool');
+      if (tool) {
+        // One-shot scroll only; nothing else may re-scroll the page
+        tool.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  }
+}
+
+function initCaseHeader() {
+  // Set today's date
+  const dateEl = document.getElementById('caseDate');
+  if (dateEl) {
+    const today = new Date();
+    dateEl.textContent = today.toLocaleDateString('en-US', { 
+      month: 'short', 
+      day: 'numeric', 
+      year: 'numeric' 
+    });
+  }
+}
+
+function updateCaseStatus(hasFindingsOrReport) {
+  const statusEl = document.getElementById('caseStatus');
+  if (statusEl) {
+    if (hasFindingsOrReport) {
+      statusEl.textContent = 'STATUS: CLOSED';
+      statusEl.classList.add('closed');
+    } else {
+      statusEl.textContent = 'STATUS: OPEN';
+      statusEl.classList.remove('closed');
+    }
+  }
+}
+
+// ========================================
+// LOCAL HISTORY
+// ========================================
+
+function saveToHistory(result) {
+  try {
+    const entry = {
+      timestamp: Date.now(),
+      mode: result.meta?.mode || 'debug',
+      language: result.meta?.language || 'unknown',
+      headline: result.verdict?.headline || 'Analysis',
+      result: result,
+      code: getEditorContent()
+    };
+    
+    const history = getHistory();
+    history.unshift(entry);
+    
+    // Keep last 10
+    const trimmed = history.slice(0, 10);
+    localStorage.setItem('tracer_history', JSON.stringify(trimmed));
+  } catch (error) {
+    console.error('Failed to save history:', error);
+  }
+}
+
+function getHistory() {
+  try {
+    const data = localStorage.getItem('tracer_history');
+    return data ? JSON.parse(data) : [];
+  } catch (error) {
+    console.error('Failed to load history:', error);
+    return [];
+  }
+}
+
+function clearHistory() {
+  try {
+    localStorage.removeItem('tracer_history');
+    renderHistoryDrawer();
+  } catch (error) {
+    console.error('Failed to clear history:', error);
+  }
+}
+
+function initHistory() {
+  const historyBtn = document.getElementById('historyBtn');
+  if (!historyBtn) return;
+  
+  historyBtn.addEventListener('click', () => {
+    toggleHistoryDrawer();
+  });
+}
+
+function toggleHistoryDrawer() {
+  let drawer = document.getElementById('historyDrawer');
+  
+  if (drawer) {
+    drawer.remove();
+    return;
+  }
+  
+  drawer = document.createElement('div');
+  drawer.id = 'historyDrawer';
+  drawer.className = 'history-drawer';
+  drawer.setAttribute('role', 'dialog');
+  drawer.setAttribute('aria-label', 'Analysis history');
+  
+  const header = document.createElement('div');
+  header.className = 'drawer-header';
+  
+  const title = document.createElement('h3');
+  title.textContent = 'History';
+  
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'btn-icon';
+  closeBtn.textContent = '×';
+  closeBtn.setAttribute('aria-label', 'Close history');
+  closeBtn.addEventListener('click', () => drawer.remove());
+  
+  header.appendChild(title);
+  header.appendChild(closeBtn);
+  drawer.appendChild(header);
+  
+  renderHistoryDrawer(drawer);
+  
+  document.body.appendChild(drawer);
+}
+
+function renderHistoryDrawer(drawer) {
+  if (!drawer) drawer = document.getElementById('historyDrawer');
+  if (!drawer) return;
+  
+  // Remove existing content except header
+  const header = drawer.querySelector('.drawer-header');
+  drawer.textContent = '';
+  if (header) drawer.appendChild(header);
+  
+  const history = getHistory();
+  
+  if (history.length === 0) {
+    const empty = document.createElement('div');
+    empty.className = 'drawer-empty';
+    empty.textContent = 'No history yet';
+    drawer.appendChild(empty);
+    return;
+  }
+  
+  const list = document.createElement('div');
+  list.className = 'history-list';
+  
+  history.forEach(entry => {
+    const item = document.createElement('div');
+    item.className = 'history-item';
+    item.setAttribute('role', 'button');
+    item.setAttribute('tabindex', '0');
+    
+    const date = new Date(entry.timestamp);
+    const timeStr = date.toLocaleString();
+    
+    const meta = document.createElement('div');
+    meta.className = 'history-meta';
+    meta.textContent = `${timeStr} • ${entry.language} • ${entry.mode}`;
+    
+    const headline = document.createElement('div');
+    headline.className = 'history-headline';
+    headline.textContent = entry.headline;
+    
+    item.appendChild(meta);
+    item.appendChild(headline);
+    
+    item.addEventListener('click', () => {
+      restoreFromHistory(entry);
+      drawer.remove();
+    });
+    
+    item.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        restoreFromHistory(entry);
+        drawer.remove();
+      }
+    });
+    
+    list.appendChild(item);
+  });
+  
+  drawer.appendChild(list);
+  
+  const clearBtn = document.createElement('button');
+  clearBtn.className = 'btn drawer-clear-btn';
+  clearBtn.textContent = 'Clear History';
+  clearBtn.addEventListener('click', () => clearHistory());
+  drawer.appendChild(clearBtn);
+}
+
+function restoreFromHistory(entry) {
+  if (entry.code) {
+    setEditorContent(entry.code);
+  }
+  if (entry.result) {
+    displayResult(entry.result);
+  }
+}
+
+// ========================================
+// KEYBOARD NAVIGATION
+// ========================================
+
+function initKeyboardNav() {
+  // Ensure focus rings are visible
+  document.body.classList.add('keyboard-nav');
+  
+  // Mobile: start on source view
+  const mainContent = document.getElementById('mainContent');
+  if (mainContent) {
+    mainContent.classList.add('show-source');
+  }
+  
+  // Esc to close drawer
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      const drawer = document.getElementById('historyDrawer');
+      if (drawer) {
+        drawer.remove();
+      }
+    }
+  });
+  
+  // Mobile tabs
+  const mobileTabs = document.querySelectorAll('.mobile-tab');
+  const mobileTraceBtn = document.querySelector('.mobile-trace-btn');
+  
+  mobileTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      mobileTabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      
+      if (tab.dataset.tab === 'source') {
+        mainContent.classList.remove('show-report');
+        mainContent.classList.add('show-source');
+      } else {
+        mainContent.classList.remove('show-source');
+        mainContent.classList.add('show-report');
+      }
+    });
+  });
+  
+  if (mobileTraceBtn) {
+    mobileTraceBtn.addEventListener('click', () => {
+      runAnalysis();
+    });
+  }
+}
+
+// Update displayResult to save to history
+const originalDisplayResult = displayResult;
+displayResult = function(data) {
+  originalDisplayResult(data);
+  saveToHistory(data);
+  updateCaseStatus(true); // Close the case
+  
+  // Auto-switch to report view on mobile
+  if (window.innerWidth <= 800) {
+    const mainContent = document.getElementById('mainContent');
+    if (mainContent) {
+      mainContent.classList.remove('show-source');
+      mainContent.classList.add('show-report');
+      
+      const mobileTabs = document.querySelectorAll('.mobile-tab');
+      mobileTabs.forEach(t => t.classList.remove('active'));
+      const reportTab = document.querySelector('.mobile-tab[data-tab="report"]');
+      if (reportTab) reportTab.classList.add('active');
+    }
+  }
+};
