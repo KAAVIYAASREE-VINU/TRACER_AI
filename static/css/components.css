@@ -1,0 +1,262 @@
+/**
+ * TRACER AI v2 - Components
+ * Top bar, editor, report sections
+ */
+
+/* ========================================
+   TOP BAR
+   ======================================== */
+
+.top-bar {
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-lg);
+  border-bottom: var(--border-width) solid var(--rule);
+  background: var(--surface);
+}
+
+.wordmark {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 400;
+  color: var(--text);
+}
+
+.wordmark-glyph {
+  width: 24px;
+  height: 24px;
+  color: var(--signal);
+}
+
+.case-number {
+  font-family: var(--font-code);
+  font-size: var(--text-sm);
+  color: var(--muted);
+  letter-spacing: 0.05em;
+}
+
+/* Mode segmented control */
+.mode-switch {
+  display: flex;
+  gap: 0;
+  background: var(--bg);
+  border: var(--border-width) solid var(--rule);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.mode-btn {
+  padding: var(--space-sm) var(--space-md);
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--muted);
+  background: transparent;
+  border: none;
+  border-right: var(--border-width) solid var(--rule);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.mode-btn:last-child {
+  border-right: none;
+}
+
+.mode-btn:hover {
+  color: var(--text);
+  background: var(--surface);
+}
+
+.mode-btn.active {
+  color: var(--bg);
+  background: var(--signal);
+}
+
+.mode-btn:focus {
+  outline: 2px solid var(--signal);
+  outline-offset: -2px;
+}
+
+/* ========================================
+   EDITOR PANEL
+   ======================================== */
+
+.editor-header {
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: var(--border-width) solid var(--rule);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.panel-title {
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.editor-actions {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.btn {
+  padding: var(--space-sm) var(--space-md);
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--text);
+  background: var(--surface);
+  border: var(--border-width) solid var(--rule);
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn:hover {
+  background: var(--bg);
+  border-color: var(--muted);
+}
+
+.btn:focus {
+  outline: 2px solid var(--signal);
+  outline-offset: 2px;
+}
+
+.btn-primary {
+  color: var(--bg);
+  background: var(--signal);
+  border-color: var(--signal);
+}
+
+.btn-primary:hover {
+  background: #c4ed2a;
+  border-color: #c4ed2a;
+}
+
+/* CodeMirror container */
+.editor-container {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Status bar */
+.status-bar {
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-md);
+  border-top: var(--border-width) solid var(--rule);
+  font-family: var(--font-code);
+  font-size: var(--text-xs);
+  color: var(--muted);
+  background: var(--surface);
+}
+
+.status-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.status-separator {
+  color: var(--rule);
+}
+
+/* ========================================
+   REPORT PANEL
+   ======================================== */
+
+.report-header {
+  padding: var(--space-lg);
+  border-bottom: var(--border-width) solid var(--rule);
+}
+
+.report-title {
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: var(--space-md);
+}
+
+.verdict {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  color: var(--text);
+  line-height: var(--leading-tight);
+}
+
+.report-content {
+  padding: var(--space-lg);
+}
+
+/* Empty state */
+.empty-state {
+  padding: var(--space-xl);
+  text-align: center;
+  color: var(--muted);
+}
+
+.empty-state-title {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  color: var(--text);
+  margin-bottom: var(--space-sm);
+}
+
+.empty-state-text {
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+}
+
+/* Findings list (placeholder) */
+.findings-list {
+  /* Will be styled in Stop B */
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 768px) {
+  .top-bar {
+    padding: 0 var(--space-md);
+  }
+  
+  .case-number {
+    display: none;
+  }
+  
+  .mode-switch {
+    font-size: var(--text-xs);
+  }
+  
+  .mode-btn {
+    padding: var(--space-xs) var(--space-sm);
+  }
+  
+  .editor-header,
+  .report-header {
+    padding: var(--space-md);
+  }
+  
+  .status-bar {
+    font-size: 10px;
+    padding: 0 var(--space-sm);
+  }
+}

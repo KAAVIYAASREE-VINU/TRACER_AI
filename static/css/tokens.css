@@ -1,0 +1,59 @@
+/**
+ * TRACER AI v2 - Design Tokens
+ * "Forensic case file" aesthetic - NO generic AI dashboard patterns
+ */
+
+:root {
+  /* Colors - Warm forensic palette */
+  --bg: #0E0D0B;           /* Warm near-black background */
+  --surface: #151310;      /* Elevated surface */
+  --rule: #2B2721;         /* Thin separator lines */
+  --text: #EDE6D6;         /* Off-white paper text */
+  --muted: #8D8574;        /* Secondary/muted text */
+  
+  /* Signal color - acid green, use sparingly */
+  --signal: #D6FF3A;       /* Primary action, focus, active tab */
+  
+  /* Severity colors */
+  --crit: #FF4B3E;         /* Critical severity */
+  --warn: #FF9F1C;         /* Warning severity */
+  --info: #8EC9C0;         /* Info severity */
+  
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  
+  /* Typography scale */
+  --text-xs: 11px;
+  --text-sm: 13px;
+  --text-base: 14px;
+  --text-lg: 16px;
+  --text-xl: 20px;
+  --text-2xl: 24px;
+  --text-3xl: 32px;
+  
+  /* Line heights */
+  --leading-tight: 1.2;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.7;
+  
+  /* Font families */
+  --font-display: 'Instrument Serif', Georgia, serif;
+  --font-ui: 'Schibsted Grotesk', 'Helvetica Neue', Arial, sans-serif;
+  --font-code: 'JetBrains Mono', 'Courier New', monospace;
+  
+  /* Borders & rules */
+  --border-width: 1px;
+  --rule-width: 1px;
+  
+  /* Z-index layers */
+  --z-base: 1;
+  --z-elevated: 10;
+  --z-modal: 100;
+}
+
+/* Font imports - Google Fonts with fallbacks */
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Schibsted+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');

@@ -1,41 +1,235 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TRACER AI v2</title>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            max-width: 800px;
-            margin: 50px auto;
-            padding: 20px;
-            background: #0E0D0B;
-            color: #EDE6D6;
-        }
-        h1 { color: #D6FF3A; }
-        code {
-            background: #151310;
-            padding: 2px 6px;
-            border-radius: 3px;
-        }
-        .status { color: #8EC9C0; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TRACER AI v2</title>
+  
+  <!-- Design tokens & base styles -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/tokens.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+  
+  <!-- CodeMirror 6 - pinned versions -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@6.0.1/dist/index.css">
 </head>
 <body>
-    <h1>TRACER AI v2 - Backend Online</h1>
-    <p class="status">✓ Backend API is running</p>
-    
-    <h2>API Endpoints</h2>
-    <ul>
-        <li><code>POST /api/analyze</code> - Analyze code</li>
-        <li><code>GET /api/health</code> - Health check</li>
-    </ul>
-    
-    <h2>Quick Test</h2>
-    <p>Run the test script:</p>
-    <pre><code>./test_api.sh</code></pre>
-    
-    <p><em>Frontend UI will be built in Phase 2</em></p>
+  <div class="app">
+    <!-- Top Bar -->
+    <header class="top-bar">
+      <div class="wordmark">
+        <svg class="wordmark-glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 3l18 18M3 21L21 3"/>
+        </svg>
+        <span>TRACER</span>
+      </div>
+      
+      <div class="case-number small-caps">
+        Case No. <span id="caseNumber">001</span>
+      </div>
+      
+      <div class="mode-switch" role="radiogroup" aria-label="Analysis mode">
+        <button class="mode-btn active" role="radio" aria-checked="true" data-mode="debug">
+          Debug
+        </button>
+        <button class="mode-btn" role="radio" aria-checked="false" data-mode="review">
+          Review
+        </button>
+        <button class="mode-btn" role="radio" aria-checked="false" data-mode="explain">
+          Explain
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+      <!-- Left Panel: Editor -->
+      <section class="panel panel-left">
+        <header class="editor-header">
+          <h2 class="panel-title">Exhibit A — Source</h2>
+          <div class="editor-actions">
+            <button class="btn" id="uploadBtn" aria-label="Upload file">
+              Upload
+            </button>
+            <button class="btn btn-primary" id="traceBtn" aria-label="Run analysis">
+              Trace Code
+            </button>
+          </div>
+        </header>
+        
+        <div class="editor-container" id="editorContainer">
+          <!-- CodeMirror will be mounted here -->
+        </div>
+        
+        <footer class="status-bar">
+          <div class="status-item">
+            <span id="statusLanguage">Python</span>
+            <span class="status-separator">•</span>
+            <span id="statusLines">0 lines</span>
+            <span class="status-separator">•</span>
+            <span id="statusChars">0 chars</span>
+          </div>
+          <div class="status-item">
+            <span id="statusMessage">Ready</span>
+          </div>
+        </footer>
+      </section>
+
+      <!-- Right Panel: Report -->
+      <section class="panel panel-right">
+        <header class="report-header">
+          <h2 class="report-title">Report</h2>
+          <div class="verdict" id="verdict">
+            —
+          </div>
+        </header>
+        
+        <div class="report-content" id="reportContent">
+          <div class="empty-state">
+            <div class="empty-state-title">No analysis yet</div>
+            <p class="empty-state-text">
+              Paste or upload source code, then click <strong>Trace Code</strong> to begin analysis.
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Hidden file input -->
+  <input type="file" id="fileInput" accept=".py,.js,.java,.cpp,.c,.sql,.ts,.jsx,.tsx" hidden>
+
+  <!-- CodeMirror 6 modules - pinned versions -->
+  <script type="module">
+    import { EditorView, basicSetup } from 'https://cdn.jsdelivr.net/npm/codemirror@6.0.1/dist/index.js';
+    import { python } from 'https://cdn.jsdelivr.net/npm/@codemirror/lang-python@6.1.6/dist/index.js';
+    import { javascript } from 'https://cdn.jsdelivr.net/npm/@codemirror/lang-javascript@6.2.2/dist/index.js';
+    import { java } from 'https://cdn.jsdelivr.net/npm/@codemirror/lang-java@6.0.1/dist/index.js';
+    import { cpp } from 'https://cdn.jsdelivr.net/npm/@codemirror/lang-cpp@6.0.2/dist/index.js';
+    import { sql } from 'https://cdn.jsdelivr.net/npm/@codemirror/lang-sql@6.7.1/dist/index.js';
+    import { oneDark } from 'https://cdn.jsdelivr.net/npm/@codemirror/theme-one-dark@6.1.2/dist/index.js';
+
+    // Store editor globally
+    window.tracerEditor = null;
+    window.tracerLanguages = { python, javascript, java, cpp, sql };
+
+    // Initialize editor
+    function initEditor() {
+      const container = document.getElementById('editorContainer');
+      
+      const editor = new EditorView({
+        doc: '# Paste your code here\n',
+        extensions: [
+          basicSetup,
+          python(),
+          oneDark,
+          EditorView.updateListener.of((update) => {
+            if (update.docChanged) {
+              updateStatus();
+            }
+          })
+        ],
+        parent: container
+      });
+
+      window.tracerEditor = editor;
+      updateStatus();
+    }
+
+    // Update status bar
+    function updateStatus() {
+      if (!window.tracerEditor) return;
+      
+      const doc = window.tracerEditor.state.doc;
+      const text = doc.toString();
+      const lines = doc.lines;
+      const chars = text.length;
+      
+      document.getElementById('statusLines').textContent = `${lines} lines`;
+      document.getElementById('statusChars').textContent = `${chars} chars`;
+      
+      // Update language based on content heuristics
+      let detectedLang = 'Python';
+      if (text.includes('function ') || text.includes('const ') || text.includes('let ')) {
+        detectedLang = 'JavaScript';
+      } else if (text.includes('public class') || text.includes('public static void')) {
+        detectedLang = 'Java';
+      } else if (text.includes('SELECT ') || text.includes('FROM ')) {
+        detectedLang = 'SQL';
+      }
+      
+      document.getElementById('statusLanguage').textContent = detectedLang;
+    }
+
+    // Mode switcher
+    document.querySelectorAll('.mode-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.mode-btn').forEach(b => {
+          b.classList.remove('active');
+          b.setAttribute('aria-checked', 'false');
+        });
+        btn.classList.add('active');
+        btn.setAttribute('aria-checked', 'true');
+      });
+    });
+
+    // Upload button
+    document.getElementById('uploadBtn').addEventListener('click', () => {
+      document.getElementById('fileInput').click();
+    });
+
+    // File upload handler
+    document.getElementById('fileInput').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        if (window.tracerEditor) {
+          const transaction = window.tracerEditor.state.update({
+            changes: {
+              from: 0,
+              to: window.tracerEditor.state.doc.length,
+              insert: event.target.result
+            }
+          });
+          window.tracerEditor.dispatch(transaction);
+          updateStatus();
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    // Trace button (placeholder for Stop B)
+    document.getElementById('traceBtn').addEventListener('click', () => {
+      document.getElementById('statusMessage').textContent = 'Tracing...';
+      document.getElementById('verdict').textContent = 'Analysis in progress...';
+      // Actual API call will be implemented in Stop B
+      setTimeout(() => {
+        document.getElementById('statusMessage').textContent = 'Ready';
+      }, 1000);
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      // Cmd/Ctrl + Enter to trace
+      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+        e.preventDefault();
+        document.getElementById('traceBtn').click();
+      }
+      
+      // Escape to clear focus
+      if (e.key === 'Escape') {
+        document.activeElement.blur();
+      }
+    });
+
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initEditor);
+    } else {
+      initEditor();
+    }
+  </script>
 </body>
 </html>

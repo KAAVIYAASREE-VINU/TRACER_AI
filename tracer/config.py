@@ -39,8 +39,15 @@ class Config:
     RATELIMIT_GLOBAL_DAILY = 1000  # total calls per day across all IPs
     
     # Security headers
+    # CSP allows only specific CDN hosts for CodeMirror and Google Fonts
     SECURITY_HEADERS = {
-        "Content-Security-Policy": "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com;",
+        "Content-Security-Policy": (
+            "default-src 'self'; "
+            "script-src 'self' https://cdn.jsdelivr.net; "
+            "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; "
+            "font-src 'self' https://fonts.gstatic.com; "
+            "connect-src 'self';"
+        ),
         "X-Content-Type-Options": "nosniff",
         "Referrer-Policy": "strict-origin-when-cross-origin",
         "X-Frame-Options": "DENY"

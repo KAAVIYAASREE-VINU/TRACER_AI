@@ -1,0 +1,108 @@
+/**
+ * TRACER AI v2 - Base Styles
+ * Reset, layout primitives, utilities
+ */
+
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Layout Container */
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+}
+
+/* Main content area */
+.main {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 50% 50%;
+  overflow: hidden;
+}
+
+/* Panels */
+.panel {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.panel-left {
+  border-right: var(--border-width) solid var(--rule);
+}
+
+.panel-right {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--rule);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
+}
+
+/* Responsive: mobile stacks vertically */
+@media (max-width: 768px) {
+  .main {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+  }
+  
+  .panel-left {
+    border-right: none;
+    border-bottom: var(--border-width) solid var(--rule);
+    max-height: 40vh;
+  }
+  
+  .panel-right {
+    overflow-y: auto;
+  }
+}
+
+/* Utility classes */
+.small-caps {
+  font-variant: small-caps;
+  letter-spacing: 0.05em;
+  text-transform: lowercase;
+}
+
+.mono {
+  font-family: var(--font-code);
+}
+
+.serif {
+  font-family: var(--font-display);
+}
