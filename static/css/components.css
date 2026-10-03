@@ -144,6 +144,18 @@
   border-color: #c4ed2a;
 }
 
+.btn.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.btn-label {
+  font-size: var(--text-xs);
+  color: var(--muted);
+  margin-left: var(--space-xs);
+}
+
 /* CodeMirror container */
 .editor-container {
   flex: 1;
@@ -229,6 +241,52 @@
   /* Will be styled in Stop B */
 }
 
+/* Example buttons */
+.examples {
+  padding: var(--space-lg);
+  border-top: var(--border-width) solid var(--rule);
+}
+
+.examples-title {
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: var(--space-md);
+}
+
+.examples-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-sm);
+}
+
+.example-btn {
+  padding: var(--space-sm) var(--space-md);
+  font-family: var(--font-code);
+  font-size: var(--text-xs);
+  color: var(--text);
+  background: var(--surface);
+  border: var(--border-width) solid var(--rule);
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: left;
+}
+
+.example-btn:hover {
+  background: var(--bg);
+  border-color: var(--signal);
+  color: var(--signal);
+}
+
+.example-btn:focus {
+  outline: 2px solid var(--signal);
+  outline-offset: 2px;
+}
+
 /* ========================================
    RESPONSIVE
    ======================================== */
@@ -255,8 +313,8 @@
     padding: var(--space-md);
   }
   
-  .status-bar {
+  .example-btn {
+    padding: var(--space-xs) var(--space-sm);
     font-size: 10px;
-    padding: 0 var(--space-sm);
   }
 }

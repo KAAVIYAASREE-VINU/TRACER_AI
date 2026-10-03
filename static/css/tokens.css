@@ -54,6 +54,3 @@
   --z-elevated: 10;
   --z-modal: 100;
 }
-
-/* Font imports - Google Fonts with fallbacks */
-@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Schibsted+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');

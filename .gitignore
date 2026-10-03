@@ -16,6 +16,10 @@ __pycache__/
 dist/
 build/
 
+# Node.js (tools/ folder only)
+tools/node_modules/
+tools/package-lock.json
+
 # IDEs
 .vscode/
 .idea/

@@ -5,13 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TRACER AI v2</title>
   
+  <!-- Favicon -->
+  <link rel="icon" href="data:,">
+  
+  <!-- Google Fonts - preconnect for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Schibsted+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
   <!-- Design tokens & base styles -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/tokens.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
-  
-  <!-- CodeMirror 6 - pinned versions -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@6.0.1/dist/index.css">
 </head>
 <body>
   <div class="app">
@@ -35,8 +40,8 @@
         <button class="mode-btn" role="radio" aria-checked="false" data-mode="review">
           Review
         </button>
-        <button class="mode-btn" role="radio" aria-checked="false" data-mode="explain">
-          Explain
+        <button class="mode-btn disabled" role="radio" aria-checked="false" data-mode="explain" title="Coming soon">
+          Explain <span class="btn-label">soon</span>
         </button>
       </div>
     </header>
@@ -58,7 +63,7 @@
         </header>
         
         <div class="editor-container" id="editorContainer">
-          <!-- CodeMirror will be mounted here -->
+          <!-- CodeMirror will be mounted here by main.js -->
         </div>
         
         <footer class="status-bar">
@@ -92,6 +97,21 @@
             </p>
           </div>
         </div>
+        
+        <div class="examples">
+          <div class="examples-title">Try an example</div>
+          <div class="examples-grid">
+            <button class="example-btn" data-example="python">
+              Python bug
+            </button>
+            <button class="example-btn" data-example="javascript">
+              JavaScript bug
+            </button>
+            <button class="example-btn" data-example="c">
+              C bug
+            </button>
+          </div>
+        </div>
       </section>
     </main>
   </div>
@@ -99,137 +119,7 @@
   <!-- Hidden file input -->
   <input type="file" id="fileInput" accept=".py,.js,.java,.cpp,.c,.sql,.ts,.jsx,.tsx" hidden>
 
-  <!-- CodeMirror 6 modules - pinned versions -->
-  <script type="module">
-    import { EditorView, basicSetup } from 'https://cdn.jsdelivr.net/npm/codemirror@6.0.1/dist/index.js';
-    import { python } from 'https://cdn.jsdelivr.net/npm/@codemirror/lang-python@6.1.6/dist/index.js';
-    import { javascript } from 'https://cdn.jsdelivr.net/npm/@codemirror/lang-javascript@6.2.2/dist/index.js';
-    import { java } from 'https://cdn.jsdelivr.net/npm/@codemirror/lang-java@6.0.1/dist/index.js';
-    import { cpp } from 'https://cdn.jsdelivr.net/npm/@codemirror/lang-cpp@6.0.2/dist/index.js';
-    import { sql } from 'https://cdn.jsdelivr.net/npm/@codemirror/lang-sql@6.7.1/dist/index.js';
-    import { oneDark } from 'https://cdn.jsdelivr.net/npm/@codemirror/theme-one-dark@6.1.2/dist/index.js';
-
-    // Store editor globally
-    window.tracerEditor = null;
-    window.tracerLanguages = { python, javascript, java, cpp, sql };
-
-    // Initialize editor
-    function initEditor() {
-      const container = document.getElementById('editorContainer');
-      
-      const editor = new EditorView({
-        doc: '# Paste your code here\n',
-        extensions: [
-          basicSetup,
-          python(),
-          oneDark,
-          EditorView.updateListener.of((update) => {
-            if (update.docChanged) {
-              updateStatus();
-            }
-          })
-        ],
-        parent: container
-      });
-
-      window.tracerEditor = editor;
-      updateStatus();
-    }
-
-    // Update status bar
-    function updateStatus() {
-      if (!window.tracerEditor) return;
-      
-      const doc = window.tracerEditor.state.doc;
-      const text = doc.toString();
-      const lines = doc.lines;
-      const chars = text.length;
-      
-      document.getElementById('statusLines').textContent = `${lines} lines`;
-      document.getElementById('statusChars').textContent = `${chars} chars`;
-      
-      // Update language based on content heuristics
-      let detectedLang = 'Python';
-      if (text.includes('function ') || text.includes('const ') || text.includes('let ')) {
-        detectedLang = 'JavaScript';
-      } else if (text.includes('public class') || text.includes('public static void')) {
-        detectedLang = 'Java';
-      } else if (text.includes('SELECT ') || text.includes('FROM ')) {
-        detectedLang = 'SQL';
-      }
-      
-      document.getElementById('statusLanguage').textContent = detectedLang;
-    }
-
-    // Mode switcher
-    document.querySelectorAll('.mode-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.mode-btn').forEach(b => {
-          b.classList.remove('active');
-          b.setAttribute('aria-checked', 'false');
-        });
-        btn.classList.add('active');
-        btn.setAttribute('aria-checked', 'true');
-      });
-    });
-
-    // Upload button
-    document.getElementById('uploadBtn').addEventListener('click', () => {
-      document.getElementById('fileInput').click();
-    });
-
-    // File upload handler
-    document.getElementById('fileInput').addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        if (window.tracerEditor) {
-          const transaction = window.tracerEditor.state.update({
-            changes: {
-              from: 0,
-              to: window.tracerEditor.state.doc.length,
-              insert: event.target.result
-            }
-          });
-          window.tracerEditor.dispatch(transaction);
-          updateStatus();
-        }
-      };
-      reader.readAsText(file);
-    });
-
-    // Trace button (placeholder for Stop B)
-    document.getElementById('traceBtn').addEventListener('click', () => {
-      document.getElementById('statusMessage').textContent = 'Tracing...';
-      document.getElementById('verdict').textContent = 'Analysis in progress...';
-      // Actual API call will be implemented in Stop B
-      setTimeout(() => {
-        document.getElementById('statusMessage').textContent = 'Ready';
-      }, 1000);
-    });
-
-    // Keyboard shortcuts
-    document.addEventListener('keydown', (e) => {
-      // Cmd/Ctrl + Enter to trace
-      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
-        e.preventDefault();
-        document.getElementById('traceBtn').click();
-      }
-      
-      // Escape to clear focus
-      if (e.key === 'Escape') {
-        document.activeElement.blur();
-      }
-    });
-
-    // Initialize when DOM is ready
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initEditor);
-    } else {
-      initEditor();
-    }
-  </script>
+  <!-- All JavaScript in external module (CSP compliant) -->
+  <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>
