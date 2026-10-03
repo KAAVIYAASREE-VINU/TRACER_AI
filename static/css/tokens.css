@@ -1,23 +1,30 @@
 /**
  * TRACER AI v2 - Design Tokens
- * "Forensic case file" aesthetic - NO generic AI dashboard patterns
+ * Linear-grade dark console + TRACER acid green
  */
 
 :root {
-  /* Colors - Warm forensic palette */
-  --bg: #0E0D0B;           /* Warm near-black background */
-  --surface: #151310;      /* Elevated surface */
-  --rule: #2B2721;         /* Thin separator lines */
-  --text: #EDE6D6;         /* Off-white paper text */
-  --muted: #8D8574;        /* Secondary/muted text */
+  /* Colors - Linear-inspired palette */
+  --bg: #0B0B0D;           /* Deep background */
+  --surface: #111114;      /* Card surface */
+  --surface-2: #17171B;    /* Elevated surface */
+  --border: rgba(255,255,255,0.07);  /* Subtle borders */
+  --border-strong: rgba(255,255,255,0.12);  /* Stronger borders */
   
-  /* Signal color - acid green, use sparingly */
-  --signal: #D6FF3A;       /* Primary action, focus, active tab */
+  --text: #ECECEF;         /* Primary text */
+  --muted: #8A8A94;        /* Secondary text */
+  --signal: #D6FF3A;       /* TRACER acid green - primary accent */
   
   /* Severity colors */
-  --crit: #FF4B3E;         /* Critical severity */
-  --warn: #FF9F1C;         /* Warning severity */
-  --info: #8EC9C0;         /* Info severity */
+  --crit: #FF5A4E;         /* Critical */
+  --warn: #FFB020;         /* Warning */
+  --info: #7DD3C8;         /* Info */
+  --ok: #5BE3A0;           /* Success/verified */
+  
+  /* Radii */
+  --radius-panel: 10px;
+  --radius-button: 8px;
+  --radius-chip: 999px;
   
   /* Spacing */
   --space-xs: 4px;
@@ -41,13 +48,12 @@
   --leading-relaxed: 1.7;
   
   /* Font families */
-  --font-display: 'Instrument Serif', Georgia, serif;
-  --font-ui: 'Schibsted Grotesk', 'Helvetica Neue', Arial, sans-serif;
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-code: 'JetBrains Mono', 'Courier New', monospace;
+  --font-display: 'Instrument Serif', Georgia, serif;
   
-  /* Borders & rules */
-  --border-width: 1px;
-  --rule-width: 1px;
+  /* Transitions */
+  --transition: 150ms cubic-bezier(0.16, 1, 0.3, 1);
   
   /* Z-index layers */
   --z-base: 1;

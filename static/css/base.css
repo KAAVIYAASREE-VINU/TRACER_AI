@@ -1,6 +1,6 @@
 /**
  * TRACER AI v2 - Base Styles
- * Reset, layout primitives, utilities
+ * Reset, layout, background effects
  */
 
 /* Reset */
@@ -23,19 +23,50 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Background effects */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 800px;
+  height: 800px;
+  background: radial-gradient(circle, rgba(214, 255, 58, 0.06) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: 
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 40px 40px;
+  opacity: 0.03;
+  pointer-events: none;
+  z-index: 0;
+}
+
 /* Layout Container */
 .app {
+  position: relative;
   display: flex;
   flex-direction: column;
   height: 100vh;
   width: 100vw;
+  z-index: 1;
 }
 
 /* Main content area */
 .main {
   flex: 1;
   display: grid;
-  grid-template-columns: 50% 50%;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-lg);
+  padding: var(--space-lg);
   overflow: hidden;
 }
 
@@ -43,16 +74,16 @@ body {
 .panel {
   display: flex;
   flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-panel);
   overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+  transition: border-color var(--transition);
 }
 
-.panel-left {
-  border-right: var(--border-width) solid var(--rule);
-}
-
-.panel-right {
-  overflow-y: auto;
-  overflow-x: hidden;
+.panel:hover {
+  border-color: var(--border-strong);
 }
 
 /* Scrollbar styling */
@@ -66,7 +97,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--rule);
+  background: var(--border-strong);
   border-radius: 4px;
 }
 
@@ -78,31 +109,27 @@ body {
 @media (max-width: 768px) {
   .main {
     grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr;
-  }
-  
-  .panel-left {
-    border-right: none;
-    border-bottom: var(--border-width) solid var(--rule);
-    max-height: 40vh;
-  }
-  
-  .panel-right {
-    overflow-y: auto;
+    gap: var(--space-md);
+    padding: var(--space-md);
   }
 }
 
 /* Utility classes */
-.small-caps {
-  font-variant: small-caps;
-  letter-spacing: 0.05em;
-  text-transform: lowercase;
-}
-
 .mono {
   font-family: var(--font-code);
 }
 
 .serif {
   font-family: var(--font-display);
+}
+
+/* Motion respect */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

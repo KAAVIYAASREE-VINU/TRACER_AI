@@ -8,12 +8,12 @@
   <!-- Favicon -->
   <link rel="icon" href="data:,">
   
-  <!-- Google Fonts - preconnect for performance -->
+  <!-- Google Fonts - preconnect -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Schibsted+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   
-  <!-- Design tokens & base styles -->
+  <!-- Styles -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/tokens.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
@@ -23,14 +23,14 @@
     <!-- Top Bar -->
     <header class="top-bar">
       <div class="wordmark">
-        <svg class="wordmark-glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg class="wordmark-glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
           <path d="M3 3l18 18M3 21L21 3"/>
         </svg>
         <span>TRACER</span>
       </div>
       
-      <div class="case-number small-caps">
-        Case No. <span id="caseNumber">001</span>
+      <div class="case-chip">
+        CASE #<span id="caseNumber">001</span>
       </div>
       
       <div class="mode-switch" role="radiogroup" aria-label="Analysis mode">
@@ -49,22 +49,21 @@
     <!-- Main Content -->
     <main class="main">
       <!-- Left Panel: Editor -->
-      <section class="panel panel-left">
+      <section class="panel">
         <header class="editor-header">
-          <h2 class="panel-title">Exhibit A — Source</h2>
+          <h2 class="panel-title">Source Code</h2>
           <div class="editor-actions">
             <button class="btn" id="uploadBtn" aria-label="Upload file">
               Upload
             </button>
             <button class="btn btn-primary" id="traceBtn" aria-label="Run analysis">
               Trace Code
+              <span class="kbd-hint">⌘↵</span>
             </button>
           </div>
         </header>
         
-        <div class="editor-container" id="editorContainer">
-          <!-- CodeMirror will be mounted here by main.js -->
-        </div>
+        <div class="editor-container" id="editorContainer"></div>
         
         <footer class="status-bar">
           <div class="status-item">
@@ -75,18 +74,33 @@
             <span id="statusChars">0 chars</span>
           </div>
           <div class="status-item">
-            <span id="statusMessage">Ready</span>
+            <span class="verification-badge muted">Ready</span>
           </div>
         </footer>
+        
+        <div class="examples">
+          <div class="examples-title">Try an example</div>
+          <div class="examples-grid">
+            <button class="example-chip" data-example="python">
+              <span class="lang-dot" style="color: #FFB020;"></span>
+              Python bug
+            </button>
+            <button class="example-chip" data-example="javascript">
+              <span class="lang-dot" style="color: #7DD3C8;"></span>
+              JavaScript bug
+            </button>
+            <button class="example-chip" data-example="c">
+              <span class="lang-dot" style="color: #FF5A4E;"></span>
+              C bug
+            </button>
+          </div>
+        </div>
       </section>
 
       <!-- Right Panel: Report -->
-      <section class="panel panel-right">
+      <section class="panel">
         <header class="report-header">
-          <h2 class="report-title">Report</h2>
-          <div class="verdict" id="verdict">
-            —
-          </div>
+          <div class="verdict" id="verdict">—</div>
         </header>
         
         <div class="report-content" id="reportContent">
@@ -97,21 +111,6 @@
             </p>
           </div>
         </div>
-        
-        <div class="examples">
-          <div class="examples-title">Try an example</div>
-          <div class="examples-grid">
-            <button class="example-btn" data-example="python">
-              Python bug
-            </button>
-            <button class="example-btn" data-example="javascript">
-              JavaScript bug
-            </button>
-            <button class="example-btn" data-example="c">
-              C bug
-            </button>
-          </div>
-        </div>
       </section>
     </main>
   </div>
@@ -119,7 +118,7 @@
   <!-- Hidden file input -->
   <input type="file" id="fileInput" accept=".py,.js,.java,.cpp,.c,.sql,.ts,.jsx,.tsx" hidden>
 
-  <!-- All JavaScript in external module (CSP compliant) -->
+  <!-- Main app -->
   <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>

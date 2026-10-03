@@ -159,13 +159,19 @@ def analyze_code(request: AnalyzeRequest) -> dict:
     
     # Detect language if auto
     if language == "auto":
-        # Simple heuristic (can be improved)
-        if "def " in code or "import " in code or "class " in code:
+        # Language detection heuristics
+        if "#include" in code and ("printf" in code or "scanf" in code):
+            language = "c"
+        elif "#include" in code or "std::" in code or "cout" in code or "cin" in code:
+            language = "cpp"
+        elif "def " in code or "import " in code or "from " in code:
             language = "python"
-        elif "function" in code or "const " in code or "let " in code:
+        elif "function" in code or "const " in code or "let " in code or "console.log" in code:
             language = "javascript"
         elif "public class" in code or "public static void" in code:
             language = "java"
+        elif "SELECT " in code.upper() or "FROM " in code.upper():
+            language = "sql"
         else:
             language = "unknown"
     

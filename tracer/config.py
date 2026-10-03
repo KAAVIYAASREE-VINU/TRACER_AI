@@ -23,7 +23,7 @@ class Config:
     
     # Groq API
     GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
-    MODEL_NAME = os.getenv("MODEL_NAME", "llama-3.3-70b-versatile")
+    MODEL_NAME = os.getenv("MODEL_NAME", "openai/gpt-oss-120b")  # Updated to available production model
     GROQ_TIMEOUT = 30  # seconds
     GROQ_MAX_RETRIES = 2  # total attempts = 1 + retries = 3
     
