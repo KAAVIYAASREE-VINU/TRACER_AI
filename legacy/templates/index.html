@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>TRACER AI</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- ================= HEADER ================= -->
+
+    <header class="header">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+
+                &lt;/&gt;
+
+            </div>
+
+            <div>
+
+                <h1>TRACER <span>AI</span></h1>
+
+                <p>AI Software Engineering Assistant</p>
+
+            </div>
+
+        </div>
+
+        <div class="engine-status">
+
+            <span class="status-dot"></span>
+
+            <span>Engine Online</span>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- ================= MAIN ================= -->
+
+    <main class="dashboard">
+
+        <!-- ================================================= -->
+        <!-- LEFT PANEL -->
+        <!-- ================================================= -->
+
+        <section class="editor-card">
+
+            <div class="editor-toolbar">
+
+                <div class="toolbar-left">
+
+                    <select id="language">
+
+                        <option value="auto">Auto Detect</option>
+                        <option value="python">Python</option>
+                        <option value="c">C</option>
+                        <option value="cpp">C++</option>
+                        <option value="java">Java</option>
+                        <option value="javascript">JavaScript</option>
+
+                    </select>
+
+                </div>
+
+                <div class="toolbar-right">
+
+                    <input
+                        type="file"
+                        id="fileInput"
+                        hidden
+                    >
+
+                    <button id="uploadBtn">
+
+                        Upload File
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="editor-container">
+
+                <div class="line-numbers" id="lineNumbers">
+
+1
+
+                </div>
+
+<textarea
+id="codeInput"
+spellcheck="false"
+placeholder="Paste your source code here..."
+></textarea>
+
+            </div>
+
+
+
+            <div class="editor-footer">
+
+                <span id="editorInfo">
+
+                    Ready
+
+                </span>
+
+                <button id="traceBtn">
+
+                    ⚡ Trace Code
+
+                </button>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ================================================= -->
+        <!-- RIGHT PANEL -->
+        <!-- ================================================= -->
+
+        <section class="results-column">
+
+            <!-- SUMMARY -->
+
+            <div class="result-card">
+
+                <div class="card-header">
+
+                    <h2>Summary</h2>
+
+                </div>
+
+                <div
+                    class="card-content"
+                    id="summary"
+                >
+
+                    Paste your code and click
+                    <strong>Trace Code</strong>.
+
+                </div>
+
+            </div>
+
+
+
+            <!-- ISSUES -->
+
+            <div class="result-card">
+
+                <div class="card-header">
+
+                    <h2>Issues Found</h2>
+
+                </div>
+
+                <div
+                    class="card-content"
+                    id="issues"
+                >
+
+                    No analysis yet.
+
+                </div>
+
+            </div>
+
+
+
+            <!-- INSIGHTS -->
+
+            <div class="result-card">
+
+                <div class="card-header">
+
+                    <h2>AI Insights</h2>
+
+                </div>
+
+                <div
+                    class="card-content"
+                    id="insights"
+                >
+
+                    Suggestions, performance improvements,
+                    security recommendations and best practices
+                    will appear here.
+
+                </div>
+
+            </div>
+
+
+
+            <!-- FIXED CODE -->
+
+            <div class="result-card fixed-card">
+
+                <div class="card-header">
+
+                    <h2>Fixed Code</h2>
+
+                    <button id="copyBtn">
+
+                        Copy
+
+                    </button>
+
+                </div>
+
+<pre id="fixedCode">
+
+Your corrected code will appear here.
+
+</pre>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,893 @@
+/* ======================================================
+   TRACER AI v2
+   Part 1 - Base + Layout + Header + Editor
+====================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* ================= RESET ================= */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+:root{
+
+    --bg:#0f1117;
+    --surface:#181c24;
+    --surface-2:#202634;
+
+    --border:#2d3544;
+
+    --primary:#4f8cff;
+    --primary-hover:#3c7af7;
+
+    --text:#f5f7fa;
+    --muted:#9ca3af;
+
+    --success:#22c55e;
+    --danger:#ef4444;
+    --warning:#f59e0b;
+
+    --radius:16px;
+
+}
+
+html,
+body{
+
+    height:100%;
+
+    font-family:"Inter",sans-serif;
+
+    background:var(--bg);
+
+    color:var(--text);
+
+    overflow:hidden;
+
+}
+
+/* ================= APP ================= */
+
+.app{
+
+    display:flex;
+
+    flex-direction:column;
+
+    height:100vh;
+
+}
+
+/* ================= HEADER ================= */
+
+.header{
+
+    height:74px;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:0 30px;
+
+    border-bottom:1px solid var(--border);
+
+    background:#12161e;
+
+}
+
+.brand{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:16px;
+
+}
+
+.brand-icon{
+
+    width:46px;
+
+    height:46px;
+
+    border-radius:14px;
+
+    background:var(--primary);
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-weight:700;
+
+    color:#fff;
+
+    font-size:18px;
+
+}
+
+.brand h1{
+
+    font-size:22px;
+
+    font-weight:700;
+
+    letter-spacing:-.5px;
+
+}
+
+.brand h1 span{
+
+    color:var(--primary);
+
+}
+
+.brand p{
+
+    font-size:13px;
+
+    color:var(--muted);
+
+    margin-top:3px;
+
+}
+
+.engine-status{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    color:var(--muted);
+
+    font-size:13px;
+
+}
+
+.status-dot{
+
+    width:8px;
+
+    height:8px;
+
+    border-radius:50%;
+
+    background:var(--success);
+
+}
+
+/* ================= DASHBOARD ================= */
+
+.dashboard{
+
+    flex:1;
+
+    display:grid;
+
+    grid-template-columns:60% 40%;
+
+    gap:24px;
+
+    padding:26px;
+
+    max-width:1800px;
+
+    width:100%;
+
+    margin:auto;
+
+    overflow:visible;
+
+}
+
+/* ================= LEFT PANEL ================= */
+
+.editor-card{
+
+    display:flex;
+
+    flex-direction:column;
+
+    background:var(--surface);
+
+    border:1px solid #374151;   
+
+    border-radius:18px;
+
+    overflow:hidden;
+
+}
+
+/* ================= TOOLBAR ================= */
+
+.editor-toolbar{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:16px 20px;
+
+    border-bottom:1px solid var(--border);
+
+}
+
+.toolbar-left,
+.toolbar-right{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+}
+
+select{
+
+    background:var(--surface-2);
+
+    color:var(--text);
+
+    border:1px solid var(--border);
+
+    border-radius:10px;
+
+    padding:10px 14px;
+
+    outline:none;
+
+    cursor:pointer;
+
+    font-size:14px;
+
+    transition:.2s;
+
+}
+
+select:hover{
+
+    border-color:var(--primary);
+
+}
+
+/* ================= BUTTONS ================= */
+
+button{
+
+    font-family:inherit;
+
+}
+
+#uploadBtn{
+
+    border:none;
+
+    background:var(--surface-2);
+
+    color:white;
+
+    padding:10px 16px;
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+}
+
+#uploadBtn:hover{
+
+    background:#2b3343;
+
+}
+
+#traceBtn{
+
+    border:none;
+
+    background:var(--primary);
+
+    color:white;
+
+    padding:14px 30px;
+
+    border-radius:12px;
+
+    font-size:14px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+}
+
+#traceBtn:hover{
+
+    background:var(--primary-hover);
+
+    transform:translateY(-1px);
+
+}
+
+/* ================= EDITOR ================= */
+
+.editor-container{
+
+    flex:1;
+
+    display:flex;
+
+    overflow:hidden;
+
+}
+
+.line-numbers{
+
+    width:58px;
+
+    background:#141821;
+
+    border-right:1px solid var(--border);
+
+    color:#6f7786;
+
+    font-family:"JetBrains Mono",monospace;
+
+    font-size:13px;
+
+    line-height:28px;
+
+    text-align:right;
+
+    padding:20px 10px;
+
+    overflow:hidden;
+
+    user-select:none;
+
+}
+
+#codeInput{
+
+    flex:1;
+
+    background:transparent;
+
+    border:none;
+
+    outline:none;
+
+    resize:none;
+
+    color:var(--text);
+
+    font-family:"JetBrains Mono",monospace;
+
+    font-size:15px;
+
+    line-height:28px;
+
+    padding:20px;
+
+    overflow:auto;
+
+}
+
+#codeInput::placeholder{
+
+    color:#6d7482;
+
+}
+
+/* ================= FOOTER ================= */
+
+.editor-footer{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:16px 20px;
+
+    border-top:1px solid var(--border);
+
+}
+
+#editorInfo{
+
+    color:var(--muted);
+
+    font-size:13px;
+
+}
+/* ======================================================
+   PART 2
+   RESULTS PANEL + CARDS + FIXED CODE
+======================================================*/
+
+/* ================= RIGHT PANEL ================= */
+
+.results-column{
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+
+    height:calc(100vh - 170px);
+    overflow-y:auto;
+    overflow-x:hidden;
+
+    padding-right:8px;
+}
+
+/* ================= CARDS ================= */
+
+.result-card{
+
+    background:var(--surface);
+
+    border:1px solid var(--border);
+
+    border-radius:18px;
+
+    overflow:visible;
+
+    transition:.25s;
+
+}
+
+.result-card:hover{
+
+    border-color:#3b4558;
+
+}
+
+/* ================= CARD HEADER ================= */
+
+.card-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:16px 20px;
+
+    border-bottom:1px solid var(--border);
+
+    background:rgba(255,255,255,.01);
+
+}
+
+.card-header h2{
+
+    font-size:15px;
+
+    font-weight:600;
+
+    letter-spacing:.2px;
+
+}
+
+/* ================= CARD CONTENT ================= */
+
+.card-content{
+
+    padding:18px 20px;
+
+    color:var(--muted);
+
+    font-size:14px;
+
+    line-height:1.7;
+
+    max-height:none;
+
+    min-height:0;
+
+    overflow:visible;
+
+    white-space:normal;
+
+}
+
+/* ================= FIXED CODE ================= */
+
+.fixed-card{
+
+    flex:1;
+
+    display:flex;
+
+    flex-direction:column;
+
+    min-height:280px;
+
+}
+
+#fixedCode{
+
+    flex:1;
+
+    margin:0;
+
+    padding:20px;
+
+    overflow:auto;
+
+    background:#141922;
+
+    color:#d8dee9;
+
+    font-family:"JetBrains Mono",monospace;
+
+    font-size:13px;
+
+    line-height:1.8;
+
+}
+
+/* ================= COPY BUTTON ================= */
+
+#copyBtn{
+
+    border:none;
+
+    background:var(--surface-2);
+
+    color:white;
+
+    padding:8px 14px;
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+}
+
+#copyBtn:hover{
+
+    background:#31394a;
+
+}
+
+/* ================= ISSUE BLOCK ================= */
+
+.issue{
+
+    padding:14px 18px;
+
+    border-left:4px solid var(--danger);
+
+    background:rgba(239,68,68,.08);
+
+    border-radius:10px;
+
+    margin-bottom:12px;
+
+}
+
+.issue:last-child{
+
+    margin-bottom:0;
+
+}
+
+.issue-title{
+
+    color:white;
+
+    font-weight:600;
+
+    margin-bottom:6px;
+
+}
+
+.issue-line{
+
+    color:var(--danger);
+
+    font-size:13px;
+
+    margin-bottom:6px;
+
+}
+
+.issue-message{
+
+    color:var(--muted);
+
+    line-height:1.6;
+
+}
+
+/* ================= INSIGHT BLOCK ================= */
+
+.insight{
+
+    padding:14px 16px;
+
+    margin-bottom:12px;
+
+    border-radius:10px;
+
+    background:#202634;
+
+}
+
+.insight:last-child{
+
+    margin-bottom:0;
+
+}
+
+/* ================= SUMMARY ================= */
+
+.summary-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(3,1fr);
+
+    gap:14px;
+
+    margin-top:16px;
+
+}
+
+.summary-item{
+
+    background:#202634;
+
+    border-radius:12px;
+
+    padding:14px;
+
+    text-align:center;
+
+}
+
+.summary-item h3{
+
+    font-size:22px;
+
+    color:var(--primary);
+
+    margin-bottom:4px;
+
+}
+
+.summary-item p{
+
+    color:var(--muted);
+
+    font-size:12px;
+
+}
+
+/* ================= SCROLLBAR ================= */
+
+::-webkit-scrollbar{
+
+    width:8px;
+
+    height:8px;
+
+}
+
+::-webkit-scrollbar-track{
+
+    background:transparent;
+
+}
+
+::-webkit-scrollbar-thumb{
+
+    background:#31384a;
+
+    border-radius:20px;
+
+}
+
+::-webkit-scrollbar-thumb:hover{
+
+    background:#46506a;
+
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media(max-width:1100px){
+
+    .dashboard{
+
+        grid-template-columns:1fr;
+
+    }
+
+    .results-column{
+
+        overflow:visible;
+
+    }
+
+    body{
+
+        overflow:auto;
+
+    }
+
+}
+
+@media(max-width:700px){
+
+    .header{
+
+        padding:0 16px;
+
+    }
+
+    .dashboard{
+
+        padding:14px;
+
+        gap:14px;
+
+    }
+
+    .editor-toolbar{
+
+        flex-direction:column;
+
+        align-items:stretch;
+
+        gap:12px;
+
+    }
+
+    .toolbar-left,
+    .toolbar-right{
+
+        width:100%;
+
+    }
+
+    select,
+    #uploadBtn,
+    #traceBtn{
+
+        width:100%;
+
+    }
+
+    .editor-footer{
+
+        flex-direction:column;
+
+        gap:12px;
+
+        align-items:stretch;
+
+    }
+
+}
+
+.summary-box{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:16px;
+
+}
+
+.summary-item h4{
+
+    margin-bottom:6px;
+
+    color:#ffffff;
+
+}
+
+.summary-item p{
+
+    margin:0;
+
+    color:#c7cedb;
+
+}
+
+.card-content h4{
+
+    margin-top:18px;
+
+    margin-bottom:8px;
+
+    color:#ffffff;
+
+}
+
+.card-content ul{
+
+    margin:8px 0;
+
+    padding-left:22px;
+
+}
+
+.card-content li{
+
+    margin-bottom:12px;
+
+    line-height:1.6;
+
+}
+
+.card-content strong{
+
+    color:#8ab4ff;
+
+}
+.issue-card,
+.result-card{
+
+    animation:fadeUp .35s ease;
+}
+
+@keyframes fadeUp{
+
+    from{
+
+        opacity:0;
+
+        transform:translateY(12px);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:translateY(0);
+
+    }
+
+}
+.summary-item{
+    margin-bottom:14px;
+}
+
+.summary-item h4{
+    margin:0 0 4px;
+    color:#7fb0ff;
+    font-size:15px;
+    font-weight:600;
+}
+
+.summary-item span{
+    color:#f5f5f5;
+    font-size:15px;
+}
